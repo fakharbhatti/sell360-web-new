@@ -1,0 +1,27 @@
+# ==========================================================
+# Enable URL Rewriting Engine
+# ==========================================================
+RewriteEngine On
+
+# ------------------------------------------------------------
+# STEP 1: Force redirect if someone accesses the .html URL directly
+# Example: privacy-policy.html -> privacy-policy
+# (301 = permanent redirect, good for SEO, avoids duplicate URLs)
+# ------------------------------------------------------------
+RewriteCond %{THE_REQUEST} \s/+(.+?)\.html[\s?] [NC]
+RewriteRule ^ /%1 [R=301,L]
+
+# ------------------------------------------------------------
+# STEP 2: Internally rewrite clean URL to actual .html file
+# Example: /privacy-policy -> privacy-policy.html (internal, browser URL stays clean)
+# Conditions ensure this only happens if the .html file actually exists
+# ------------------------------------------------------------
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.html -f
+RewriteRule ^([^/]+)/?$ $1.html [L]
+
+# ------------------------------------------------------------
+# STEP 3 (Optional but recommended): Prevent direct access errors
+# If someone requests a non-existing clean URL, normal 404 will trigger
+# ------------------------------------------------------------
+ErrorDocument 404 /404.html
