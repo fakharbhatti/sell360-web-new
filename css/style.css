@@ -1229,6 +1229,20 @@ footer ul li:before {
   color: #fff;
   box-shadow: 2px 2px 8px rgba(0, 56, 186, .5), 0 8px 15px rgba(0, 56, 186, .3)
 }
+.contact-form .send-btn:disabled {
+  opacity: .7;
+  cursor: not-allowed
+}
+.contact-form .form-msg {
+  margin-top: 15px;
+  font-size: 15px
+}
+.contact-form .form-msg.success {
+  color: #1e9e4a
+}
+.contact-form .form-msg.error {
+  color: #d93025
+}
 .offices {
   margin-top: 50px
 }

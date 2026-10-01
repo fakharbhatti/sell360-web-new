@@ -28,7 +28,7 @@
 <link href="https://fonts.googleapis.com/css?family=Barlow+Condensed:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800|Roboto:100,100i,300,300i,400,400i,500,500i,700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
-<link rel="stylesheet" type="text/css" href="css/style.css?v=1.4">
+<link rel="stylesheet" type="text/css" href="css/style.css?v=1.5">
 <link rel="stylesheet" type="text/css" href="css/animate.css">
 </head>
 
@@ -68,47 +68,49 @@
 					  
 						<div class="col-lg-6 col-md-12">
 						
-						<div class="contact-form">
+						<form class="contact-form" id="contactForm" action="contact-mail.php" method="post" novalidate>
                                            <div class="row">
                                             <div class="col-md-12 wow fadeInUp" data-wow-delay="0.4s">
-                                                <div class="form-group"> 
-                                                    <input type="text" name="name" id="name" class="form-control" placeholder="Name">
+                                                <div class="form-group">
+                                                    <input type="text" name="name" id="name" class="form-control" placeholder="Name" maxlength="100" required>
                                                 </div>
 												</div>
-											 
+
 											  <div class="col-md-12 wow fadeInUp" data-wow-delay="0.5s">
-                                                <div class="form-group"> 
-                                                    <input type="text" name="name" id="Email" class="form-control" placeholder="Email">
+                                                <div class="form-group">
+                                                    <input type="email" name="email" id="email" class="form-control" placeholder="Email" maxlength="150" required>
                                                 </div>
 												</div>
-										     
+
                                                 <div class="col-md-12 wow fadeInUp" data-wow-delay="0.6s">
-                                                <div class="form-group"> 
-                                                    <input type="text" name="name" id="Phone" class="form-control" placeholder="Phone">
+                                                <div class="form-group">
+                                                    <input type="tel" name="phone" id="phone" class="form-control" placeholder="Phone" maxlength="30">
                                                 </div>
 												</div>
 												 <div class="col-md-12 wow fadeInUp" data-wow-delay="0.7s">
-                                                <div class="form-group"> 
-                                                    <input type="text" name="name" id="Phone" class="form-control" placeholder="Subject">
+                                                <div class="form-group">
+                                                    <input type="text" name="subject" id="subject" class="form-control" placeholder="Subject" maxlength="200">
                                                 </div>
 												</div>
-												
-						 				  </div> 
-						 				  
-						 				   
-										  
+
+						 				  </div>
+
+						 				   <!-- honeypot (spam trap), hidden from users -->
+						 				   <input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true">
+
 							 			 <div class="row">
-							 			 	<div class="col-md-12 wow fadeInUp" data-wow-delay="0.8s">                                             
-                     						 <textarea class="form-control" name="message" id="message" rows="5" placeholder="Message"></textarea>
-                 
+							 			 	<div class="col-md-12 wow fadeInUp" data-wow-delay="0.8s">
+                     						 <textarea class="form-control" name="message" id="message" rows="5" placeholder="Message" maxlength="5000" required></textarea>
+
                                        		 </div>
-                                       		 
+
                                        		 <div class="col-md-12 wow fadeInUp" data-wow-delay="0.9s">
-                                            	<button type="button" class="send-btn" value="submit" id="btn_submit" onclick="proceed();">SEND</button>
+                                            	<button type="submit" class="send-btn" id="btn_submit">SEND</button>
+                                            	<div id="formMsg" class="form-msg" role="status" aria-live="polite"></div>
                                        		 </div>
-							 			 	
+
 							 			 </div>
-						  </div>
+						  </form>
 						  
 						</div>
 						
@@ -241,6 +243,43 @@ function hasScrolled() {
     lastScrollTop = st;
 }
 new WOW().init();
+
+// Contact form - AJAX submit
+$('#contactForm').on('submit', function (e) {
+	e.preventDefault();
+	var $form = $(this), $btn = $('#btn_submit'), $msg = $('#formMsg');
+	var name = $.trim($('#name').val()), email = $.trim($('#email').val()), message = $.trim($('#message').val());
+
+	$msg.removeClass('success error').text('');
+	if (!name || !email || !message) {
+		$msg.addClass('error').text('Please fill in your name, email and message.');
+		return;
+	}
+	if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+		$msg.addClass('error').text('Please enter a valid email address.');
+		return;
+	}
+
+	$btn.prop('disabled', true).text('SENDING...');
+	$.ajax({
+		url: $form.attr('action'),
+		type: 'POST',
+		data: $form.serialize(),
+		dataType: 'json'
+	}).done(function (res) {
+		if (res.success) {
+			$msg.addClass('success').text(res.message);
+			$form[0].reset();
+		} else {
+			$msg.addClass('error').text(res.message);
+		}
+	}).fail(function (xhr) {
+		var res = xhr.responseJSON;
+		$msg.addClass('error').text(res && res.message ? res.message : 'Something went wrong. Please try again.');
+	}).always(function () {
+		$btn.prop('disabled', false).text('SEND');
+	});
+});
 </script>
  
  
