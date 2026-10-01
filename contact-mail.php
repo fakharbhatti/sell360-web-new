@@ -45,11 +45,14 @@ $phone   = $clean('phone');
 $subject = $clean('subject');
 $message = isset($_POST['message']) ? trim($_POST['message']) : '';
 
-if ($name === '' || $email === '' || $message === '') {
-    respond(false, 'Please fill in your name, email and message.', 422);
+if ($name === '' || $email === '' || $phone === '' || $subject === '' || $message === '') {
+    respond(false, 'Please fill in all required fields.', 422);
 }
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     respond(false, 'Please enter a valid email address.', 422);
+}
+if (!preg_match('/^\+?[0-9\s\-()]{7,20}$/', $phone)) {
+    respond(false, 'Please enter a valid phone number.', 422);
 }
 if (strlen($message) > 5000 || strlen($name) > 100 || strlen($subject) > 200) {
     respond(false, 'Your message is too long.', 422);
