@@ -12,13 +12,18 @@ require __DIR__ . '/phpmailer/SMTP.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
-$config = require __DIR__ . '/mail-config.php';
-
 function respond($ok, $message, $code = 200) {
     http_response_code($code);
     echo json_encode(['success' => $ok, 'message' => $message]);
     exit;
 }
+
+$configFile = __DIR__ . '/mail-config.php';
+if (!is_readable($configFile)) {
+    error_log('Contact form: mail-config.php is missing or not readable by PHP');
+    respond(false, 'Sorry, your message could not be sent. Please try again later.', 500);
+}
+$config = require $configFile;
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     respond(false, 'Invalid request.', 405);
