@@ -68,7 +68,7 @@
 					  
 						<div class="col-lg-6 col-md-12">
 						
-						<form class="contact-form" id="contactForm" action="contact-mail.php" method="post" novalidate>
+						<form class="contact-form ajax-form" id="contactForm" action="contact-mail.php" method="post" novalidate>
                                            <div class="row">
                                             <div class="col-md-12 wow fadeInUp" data-wow-delay="0.4s">
                                                 <div class="form-group">
@@ -243,54 +243,8 @@ function hasScrolled() {
     lastScrollTop = st;
 }
 new WOW().init();
-
-// Contact form - AJAX submit
-$('#contactForm').on('submit', function (e) {
-	e.preventDefault();
-	var $form = $(this), $btn = $('#btn_submit'), $msg = $('#formMsg');
-	var $empty = $form.find('[required]').filter(function () { return !$.trim(this.value); });
-	var email = $.trim($('#email').val()), phone = $.trim($('#phone').val());
-
-	$msg.removeClass('success error').text('');
-	$form.find('.is-invalid').removeClass('is-invalid');
-	if ($empty.length) {
-		$empty.addClass('is-invalid').first().focus();
-		$msg.addClass('error').text('Please fill in all required fields.');
-		return;
-	}
-	if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-		$('#email').addClass('is-invalid').focus();
-		$msg.addClass('error').text('Please enter a valid email address.');
-		return;
-	}
-	if (!/^\+?[0-9\s\-()]{7,20}$/.test(phone)) {
-		$('#phone').addClass('is-invalid').focus();
-		$msg.addClass('error').text('Please enter a valid phone number.');
-		return;
-	}
-
-	$btn.prop('disabled', true).text('SENDING...');
-	$.ajax({
-		url: $form.attr('action'),
-		type: 'POST',
-		data: $form.serialize(),
-		dataType: 'json'
-	}).done(function (res) {
-		if (res.success) {
-			$msg.addClass('success').text(res.message);
-			$form[0].reset();
-		} else {
-			$msg.addClass('error').text(res.message);
-		}
-	}).fail(function (xhr) {
-		var res = xhr.responseJSON;
-		$msg.addClass('error').text(res && res.message ? res.message : 'Something went wrong. Please try again.');
-	}).always(function () {
-		$btn.prop('disabled', false).text('SEND');
-	});
-});
-$('#contactForm').on('input', '.is-invalid', function () { $(this).removeClass('is-invalid'); });
 </script>
+<script src="js/ajax-form.js"></script>
  
  
 </body>
